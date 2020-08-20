@@ -169,7 +169,7 @@ class BarcodeScannerViewController: UIViewController {
     private var topBottomMargin: CGFloat = 80
     private var scanLine: UIView = UIView()
     var screenSize = UIScreen.main.bounds
-    private var isOrientationPortrait = true
+    private var isOrientationPortrait = false
     var screenHeight:CGFloat = 0
     let captureMetadataOutput = AVCaptureMetadataOutput()
     
@@ -213,13 +213,23 @@ class BarcodeScannerViewController: UIViewController {
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        self.isOrientationPortrait = isLandscape
+        let value = UIInterfaceOrientation.landscapeLeft.rawValue
+        UIDevice.current.setValue(value, forKey: "orientation")
+        self.isOrientationPortrait = false //isLandscape
         self.initUIComponents()
     }
     
     override public func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.moveVertically()
+        // self.moveVertically()
+    }
+
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .landscapeLeft
+    }
+
+    override var shouldAutorotate: Bool {
+        return false
     }
     
     // Init UI components needed
@@ -293,11 +303,11 @@ class BarcodeScannerViewController: UIViewController {
 
         overlayPath.append(transparentPath)
         overlayPath.usesEvenOddFillRule = true
-        let fillLayer = CAShapeLayer()
+        // let fillLayer = CAShapeLayer()
         
-        fillLayer.path = overlayPath.cgPath
-        fillLayer.fillRule = CAShapeLayerFillRule.evenOdd
-        fillLayer.fillColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).cgColor
+        // fillLayer.path = overlayPath.cgPath
+        // fillLayer.fillRule = CAShapeLayerFillRule.evenOdd
+        // fillLayer.fillColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5).cgColor
         
         videoPreviewLayer?.layoutSublayers()
         videoPreviewLayer?.layoutIfNeeded()
@@ -324,7 +334,7 @@ class BarcodeScannerViewController: UIViewController {
         if let qrCodeFrameView = qrCodeFrameView {
             self.view.addSubview(qrCodeFrameView)
             self.view.bringSubviewToFront(qrCodeFrameView)
-            qrCodeFrameView.layer.insertSublayer(fillLayer, below: videoPreviewLayer!)
+            // qrCodeFrameView.layer.insertSublayer(fillLayer, below: videoPreviewLayer!)
             self.view.bringSubviewToFront(bottomView)
             self.view.bringSubviewToFront(flashIcon)
             if(!SwiftFlutterBarcodeScannerPlugin.isShowFlashIcon){
@@ -336,7 +346,7 @@ class BarcodeScannerViewController: UIViewController {
             self.view.bringSubviewToFront(cancelButton)
         }
         setConstraintsForControls()
-        self.drawLine()
+        // self.drawLine()
         processCompletionCallback()
     }
     
@@ -453,7 +463,8 @@ class BarcodeScannerViewController: UIViewController {
     }
     
     var isLandscape: Bool {
-        return UIDevice.current.orientation.isValidInterfaceOrientation
+        // return false;
+        UIDevice.current.orientation.isValidInterfaceOrientation
             ? UIDevice.current.orientation.isPortrait
             : UIApplication.shared.statusBarOrientation.isPortrait
     }
@@ -505,7 +516,7 @@ extension BarcodeScannerViewController{
     func updateUIAfterRotation(){
         DispatchQueue.main.async {
             if UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown {
-                self.isOrientationPortrait = true
+                self.isOrientationPortrait = false
             }else{
                 self.isOrientationPortrait = false
             }
@@ -546,28 +557,28 @@ extension BarcodeScannerViewController{
     func setVideoPreviewOrientation(){
         switch(UIDevice.current.orientation){
         case .unknown:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
             break
         case .portrait:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
             break
         case .portraitUpsideDown:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portraitUpsideDown
+            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
             break
         case .landscapeLeft:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeRight
+            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
             break
         case .landscapeRight:
             self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
             break
         case .faceUp:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
             break
         case .faceDown:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
             break
         @unknown default:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
             break
         }
     }
